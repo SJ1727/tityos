@@ -8,6 +8,7 @@
 #include <memory>
 #include <algorithm>
 #include <numeric>
+#include <iomanip>
 
 namespace Tityos
 {
@@ -51,6 +52,7 @@ namespace Tityos
 
         private:
             int tensorIndexToFlat(std::vector<int> index) const;
+            void printRecurse(int dim, std::vector<int> idx) const;
 
         private:
             std::vector<int> shape_;

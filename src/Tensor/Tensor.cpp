@@ -1,5 +1,4 @@
 #include "Tityos/Tensor/Tensor.hpp"
-#include <algorithm>
 
 namespace Tityos
 {
@@ -35,7 +34,7 @@ namespace Tityos
             {
                 if (shape[i] < 1)
                 {
-                    throw std::runtime_error(std::format("Dims should be positive: Dim at position {} is less than 1. {} < 1", i, shape[i]));
+                    throw std::invalid_argument(std::format("Dims should be positive: Dim at position {} is less than 1. {} < 1", i, shape[i]));
                 }
             }
 
@@ -53,7 +52,7 @@ namespace Tityos
             {
                 if (shape[i] < 1)
                 {
-                    throw std::runtime_error(std::format("Dims should be positive: Dim at position {} is less than 1. {} < 1", i, shape[i]));
+                    throw std::invalid_argument(std::format("Dims should be positive: Dim at position {} is less than 1. {} < 1", i, shape[i]));
                 }
             }
 
@@ -75,7 +74,7 @@ namespace Tityos
             {
                 if (shape[i] < 1)
                 {
-                    throw std::runtime_error(std::format("Dims should be positive: Dim at position {} is less than 1. {} < 1", i, shape[i]));
+                    throw std::invalid_argument(std::format("Dims should be positive: Dim at position {} is less than 1. {} < 1", i, shape[i]));
                 }
             }
         }
@@ -87,10 +86,31 @@ namespace Tityos
 
         void FloatTensor::print() const
         {
-            std::cout << "FloatTensor of shape: ";
-            for (int s : shape_)
-                std::cout << s << " ";
-            std::cout << std::endl;
+            printRecurse(0, {});
+        }
+
+        void FloatTensor::printRecurse(int dim, std::vector<int> idx) const
+        {
+            if (dim == shape_.size())
+            {
+                int flatIndex = tensorIndexToFlat(idx);
+                std::cout << std::setprecision(4) << (*data_)[flatIndex];
+                return;
+            }
+
+            std::cout << "[";
+            for (int i = 0; i < shape_[dim]; ++i)
+            {
+                std::vector<int> next_idx = idx;
+                next_idx.push_back(i);
+
+                printRecurse(dim + 1, next_idx);
+                if (i < shape_[dim] - 1)
+                {
+                    std::cout << (dim == shape_.size() - 1 ? ", " : ",\n ");
+                }
+            }
+            std::cout << "]";
         }
 
         FloatTensor FloatTensor::at(std::vector<Slice> slices) const
@@ -150,7 +170,7 @@ namespace Tityos
             int dataIndex = 0;
             int stepSize = 1;
 
-            for (int i = 0; i < index.size(); i++)
+            for (int i = dataShape_.size() - 1; i >= 0; i--)
             {
                 dataIndex += (index[i] + offsets_[i]) * stepSize;
                 stepSize *= dataShape_[i];
