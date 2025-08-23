@@ -1,43 +1,62 @@
-#include <catch2/catch_test_macros.hpp>
 #include "Tityos/Tensor/Tensor.hpp"
+#include <catch2/catch_test_macros.hpp>
 
 #include <random>
 
 using namespace Tityos;
 
-TEST_CASE("Check tensor shape return", "[tensor][basic]")
-{
-    std::vector expected = {3, 2, 4};
-    Tensor::FloatTensor test({3, 2, 4});
+TEST_CASE("Check tensor shape return", "[tensor][basic]") {
+    Tensor::FloatTensor t1({3, 2, 4});
+    REQUIRE(t1.shape() == std::vector{3, 2, 4});
 
-    REQUIRE(test.shape() == expected);
+    Tensor::FloatTensor t2({5});
+    REQUIRE(t2.shape() == std::vector{5});
+
+    // Empty tensor creation
+    Tensor::FloatTensor t3({});
+    REQUIRE(t3.shape() == std::vector<int>{});
 }
 
-TEST_CASE("Slice struct comparison", "[slice][basic]")
-{
-    Tensor::Slice test1 = 1;
-    Tensor::Slice test2(4, 5);
+TEST_CASE("Slice struct comparison", "[slice][basic]") {
+    Tensor::Slice s1 = 1;
+    Tensor::Slice s2(4, 5);
 
-    REQUIRE(test1 < 3);
-    REQUIRE(test2 < 6);
-    REQUIRE_FALSE(test2 < 5);
+    REQUIRE(s1 < 3);
+    REQUIRE_FALSE(s1 < 0);
+
+    REQUIRE(s2 < 6);
+    REQUIRE_FALSE(s2 < 5);
+
+    REQUIRE(s1 == Tensor::Slice(1));
+    REQUIRE(s1 != s2);
+
     REQUIRE_THROWS_AS(Tensor::Slice(5, 4), std::invalid_argument);
 }
 
-TEST_CASE("Access data from tensor", "[tensor][basic]")
-{
+TEST_CASE("Access data from tensor", "[tensor][basic]") {
     int totalSize = 3 * 2 * 4;
-
     std::vector<float> data(totalSize);
 
     for (int i = 0; i < totalSize; ++i)
-    {
         data[i] = static_cast<float>(i + 1);
+
+    Tensor::FloatTensor t({3, 2, 4}, data);
+
+    // Spot checks
+    REQUIRE(t.at({0, 0, 0}).item() == data[0]);
+    REQUIRE(t.at({2, 1, 2}).item() == data[22]);
+    REQUIRE(t.at({2, 1, 3}).item() == data[23]);
+
+    // Loop-based consistency check
+    for (int i = 0; i < totalSize; ++i) {
+        int z = i / (2 * 4);
+        int y = (i / 4) % 2;
+        int x = i % 4;
+        REQUIRE(t.at({z, y, x}).item() == data[i]);
     }
 
-    Tensor::FloatTensor test({3, 2, 4}, data);
-
-    REQUIRE(test.at({0, 0, 0}).item() == data[0]);
-    REQUIRE(test.at({2, 1, 2}).item() == data[22]);
-    REQUIRE(test.at({2, 1, 3}).item() == data[23]);
+    // Out-of-bounds access
+    REQUIRE_THROWS_AS(t.at({3, 0, 0}), std::out_of_range);
+    REQUIRE_THROWS_AS(t.at({0, 2, 0}), std::out_of_range);
+    REQUIRE_THROWS_AS(t.at({0}), std::invalid_argument);
 }

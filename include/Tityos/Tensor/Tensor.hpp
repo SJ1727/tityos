@@ -1,21 +1,18 @@
 #pragma once
 
-#include <vector>
-#include <iostream>
-#include <stdexcept>
-#include <format>
-#include <compare>
-#include <memory>
 #include <algorithm>
-#include <numeric>
+#include <compare>
+#include <format>
 #include <iomanip>
+#include <iostream>
+#include <memory>
+#include <numeric>
+#include <stdexcept>
+#include <vector>
 
-namespace Tityos
-{
-    namespace Tensor
-    {
-        struct Slice
-        {
+namespace Tityos {
+    namespace Tensor {
+        struct Slice {
             int start;
             int end;
             int stride;
@@ -26,39 +23,39 @@ namespace Tityos
             Slice(int v) : Slice(v, v + 1) {}
 
             std::strong_ordering operator<=>(int v) const;
+            bool operator==(const Slice &other) const;
             bool operator==(int v) const;
         };
 
-        class Tensor
-        {
-        public:
+        class Tensor {
+          public:
             virtual ~Tensor() = default;
 
             virtual std::vector<int> shape() const = 0;
             virtual void print() const = 0;
         };
 
-        class FloatTensor : public Tensor
-        {
-        public:
+        class FloatTensor : public Tensor {
+          public:
             FloatTensor(const std::vector<int> &shape);
             FloatTensor(const std::vector<int> &shape, std::vector<float> data);
-            FloatTensor(std::shared_ptr<std::vector<float>> data, const std::vector<int> &dataShape, const std::vector<int> &shape, std::vector<int> offsets);
+            FloatTensor(std::shared_ptr<std::vector<float>> data, const std::vector<int> &dataShape,
+                        const std::vector<int> &shape, int offset);
             std::vector<int> shape() const override;
             void print() const override;
 
             FloatTensor at(std::vector<Slice> slices) const;
             float item() const;
 
-        private:
+          private:
             int tensorIndexToFlat(std::vector<int> index) const;
             void printRecurse(int dim, std::vector<int> idx) const;
 
-        private:
+          private:
             std::vector<int> shape_;
-            std::vector<int> offsets_;
+            int offset_;
             std::vector<int> dataShape_;
             std::shared_ptr<std::vector<float>> data_;
         };
-    }
-}
+    } // namespace Tensor
+} // namespace Tityos
