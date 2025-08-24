@@ -21,7 +21,7 @@ namespace Tityos {
             offset_ = 0;
         }
 
-        FloatTensor::FloatTensor(const std::vector<int> &shape, std::vector<float> data)
+        FloatTensor::FloatTensor(std::vector<float> data, const std::vector<int> &shape)
             : shape_(shape), dataShape_(shape) {
             for (int i = 0; i < shape.size(); i++) {
                 if (shape[i] < 1) {
@@ -52,6 +52,14 @@ namespace Tityos {
                         shape[i]));
                 }
             }
+        }
+
+        int FloatTensor::size() const {
+            return std::accumulate(shape_.begin(), shape_.end(), 1, std::multiplies<int>());
+        }
+
+        int FloatTensor::numDims() const {
+            return shape_.size();
         }
 
         std::vector<int> FloatTensor::shape() const {
@@ -135,6 +143,51 @@ namespace Tityos {
             std::vector<int> firstElementIndex(shape_.size(), 0);
 
             return (*data_)[tensorIndexToFlat(firstElementIndex)];
+        }
+
+        bool FloatTensor::isContiguous() const {
+            bool dimMustbeSingle = false;
+
+            for (int i = shape_.size() - 1; i >= 0; i--) {
+                if (dimMustbeSingle && shape_[i] != 1) {
+                    return false;
+                }
+
+                if (shape_[i] != dataShape_[i]) {
+                    dimMustbeSingle = true;
+                }
+            }
+
+            return true;
+        }
+
+        FloatTensor FloatTensor::contiguous() const {
+            if (this->isContiguous()) {
+                return FloatTensor(data_, dataShape_, shape_, offset_);
+            } else {
+                return this->clone();
+            }
+        }
+
+        FloatTensor FloatTensor::clone() const {
+            std::vector<float> clonedData;
+            std::vector<int> index(shape_.size(), 0);
+            clonedData.resize(this->size());
+
+            // Loops through the data such that the result is contiguous
+            for (int i = 0; i < this->size(); i++) {
+                clonedData[i] = (*data_)[tensorIndexToFlat(index)];
+
+                for (int j = shape_.size() - 1; j >= 0; j--) {
+                    index[j]++;
+                    if (index[j] != shape_[j]) {
+                        break;
+                    }
+                    index[j] = 0;
+                }
+            }
+
+            return FloatTensor(clonedData, shape_);
         }
 
         int FloatTensor::tensorIndexToFlat(std::vector<int> index) const {

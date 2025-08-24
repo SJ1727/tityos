@@ -1,5 +1,5 @@
 #include "Tityos/Tensor/Tensor.hpp"
-#include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_all.hpp>
 
 #include <random>
 
@@ -35,28 +35,62 @@ TEST_CASE("Slice struct comparison", "[slice][basic]") {
 
 TEST_CASE("Access data from tensor", "[tensor][basic]") {
     int totalSize = 3 * 2 * 4;
-    std::vector<float> data(totalSize);
+    std::vector<float> data1(totalSize);
 
-    for (int i = 0; i < totalSize; ++i)
-        data[i] = static_cast<float>(i + 1);
+    for (int i = 0; i < totalSize; i++) {
+        data1[i] = static_cast<float>(i + 1);
+    }
 
-    Tensor::FloatTensor t({3, 2, 4}, data);
+    Tensor::FloatTensor test1(data1, {3, 2, 4});
 
     // Spot checks
-    REQUIRE(t.at({0, 0, 0}).item() == data[0]);
-    REQUIRE(t.at({2, 1, 2}).item() == data[22]);
-    REQUIRE(t.at({2, 1, 3}).item() == data[23]);
+    REQUIRE(test1.at({0, 0, 0}).item() == data1[0]);
+    REQUIRE(test1.at({2, 1, 2}).item() == data1[22]);
+    REQUIRE(test1.at({2, 1, 3}).item() == data1[23]);
 
     // Loop-based consistency check
-    for (int i = 0; i < totalSize; ++i) {
+    for (int i = 0; i < totalSize; i++) {
         int z = i / (2 * 4);
         int y = (i / 4) % 2;
         int x = i % 4;
-        REQUIRE(t.at({z, y, x}).item() == data[i]);
+        REQUIRE(test1.at({z, y, x}).item() == data1[i]);
     }
 
     // Out-of-bounds access
-    REQUIRE_THROWS_AS(t.at({3, 0, 0}), std::out_of_range);
-    REQUIRE_THROWS_AS(t.at({0, 2, 0}), std::out_of_range);
-    REQUIRE_THROWS_AS(t.at({0}), std::invalid_argument);
+    REQUIRE_THROWS_AS(test1.at({3, 0, 0}), std::out_of_range);
+    REQUIRE_THROWS_AS(test1.at({0, 2, 0}), std::out_of_range);
+    REQUIRE_THROWS_AS(test1.at({0}), std::invalid_argument);
+}
+
+TEST_CASE("Cloning data", "[tensor][basic][benchmark]") {
+    int totalSize = 3 * 2 * 4;
+
+    std::vector<float> data1(totalSize);
+
+    for (int i = 0; i < totalSize; i++) {
+        data1[i] = static_cast<float>(i + 1);
+    }
+
+    Tensor::FloatTensor test1(data1, {3, 2, 4});
+    Tensor::FloatTensor test1Clone = test1.clone();
+    std::vector<Tensor::Slice> index(test1.numDims(), 0);
+
+    // Location check
+    for (int i = 0; i < test1.size(); i++) {
+        REQUIRE(test1.at(index).item() == test1Clone.at(index).item());
+
+        for (int j = test1.numDims(); j >= 0; j--) {
+            index[j]++;
+            if (index[j] != test1.shape()[j]) {
+                break;
+            }
+            index[j] = 0;
+        }
+    }
+
+    // Contiguous check
+    Tensor::FloatTensor test2 = test1.at({Tensor::Slice(1, 3), 1, Tensor::Slice(2, 3)});
+    Tensor::FloatTensor test2Cloned = test2.clone();
+
+    REQUIRE(test2Cloned.isContiguous());
 }

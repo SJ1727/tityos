@@ -19,6 +19,8 @@ namespace Tityos {
             std::strong_ordering operator<=>(int v) const;
             bool operator==(const Slice &other) const;
             bool operator==(int v) const;
+            Slice& operator++();
+            Slice operator++(int);
         };
     }
 }

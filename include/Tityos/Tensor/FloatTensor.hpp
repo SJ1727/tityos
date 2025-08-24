@@ -7,14 +7,21 @@ namespace Tityos {
         class FloatTensor : public TensorBase {
           public:
             FloatTensor(const std::vector<int> &shape);
-            FloatTensor(const std::vector<int> &shape, std::vector<float> data);
+            FloatTensor(std::vector<float> data, const std::vector<int> &shape);
             FloatTensor(std::shared_ptr<std::vector<float>> data, const std::vector<int> &dataShape,
                         const std::vector<int> &shape, int offset);
+
+            int size() const;
+            int numDims() const;
             std::vector<int> shape() const override;
             void print() const override;
 
             FloatTensor at(std::vector<Tityos::Tensor::Slice> slices) const;
             float item() const;
+
+            bool isContiguous() const;
+            FloatTensor contiguous() const;
+            FloatTensor clone() const;
 
           private:
             int tensorIndexToFlat(std::vector<int> index) const;

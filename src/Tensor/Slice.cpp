@@ -26,5 +26,18 @@ namespace Tityos {
         bool Slice::operator==(int v) const {
             return v == start && v == end;
         }
-    }
-}
+
+        Slice &Slice::operator++() {
+            start++;
+            end++;
+            return *this;
+        }
+
+        Slice Slice::operator++(int) {
+            Slice temp = *this;
+            start++;
+            end++;
+            return temp;
+        }
+    } // namespace Tensor
+} // namespace Tityos
