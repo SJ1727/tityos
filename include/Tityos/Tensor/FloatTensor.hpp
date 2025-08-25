@@ -6,9 +6,10 @@ namespace Tityos {
     namespace Tensor {
         class FloatTensor : public TensorBase {
           public:
-            FloatTensor(const std::vector<int> &shape);
+            FloatTensor(const std::vector<int> &shape)
+                : FloatTensor(std::vector<float>(vectorElementProduct(shape), 0.0f), shape) {}
             FloatTensor(std::vector<float> data, const std::vector<int> &shape);
-            FloatTensor(std::shared_ptr<std::vector<float>> data, const std::vector<int> &dataShape,
+            FloatTensor(std::shared_ptr<std::vector<float>> data, const std::vector<int> &strides,
                         const std::vector<int> &shape, int offset);
 
             int size() const;
@@ -30,7 +31,7 @@ namespace Tityos {
           private:
             std::vector<int> shape_;
             int offset_;
-            std::vector<int> dataShape_;
+            std::vector<int> strides_;
             std::shared_ptr<std::vector<float>> data_;
         };
     } // namespace Tensor

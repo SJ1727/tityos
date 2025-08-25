@@ -2,27 +2,8 @@
 
 namespace Tityos {
     namespace Tensor {
-        FloatTensor::FloatTensor(const std::vector<int> &shape) : shape_(shape), dataShape_(shape) {
-            int totalSize = 1;
-
-            for (int i = 0; i < shape.size(); i++) {
-                if (shape[i] < 1) {
-                    throw std::invalid_argument(std::format(
-                        "Dims should be positive: Dim at position {} is less than 1. {} < 1", i,
-                        shape[i]));
-                }
-            }
-
-            for (int dim : shape) {
-                totalSize *= dim;
-            }
-
-            data_ = std::make_unique<std::vector<float>>(totalSize, 0.0f);
-            offset_ = 0;
-        }
-
         FloatTensor::FloatTensor(std::vector<float> data, const std::vector<int> &shape)
-            : shape_(shape), dataShape_(shape) {
+            : shape_(shape) {
             for (int i = 0; i < shape.size(); i++) {
                 if (shape[i] < 1) {
                     throw std::invalid_argument(std::format(
@@ -36,14 +17,22 @@ namespace Tityos {
                 throw std::invalid_argument("Shape does not fit for size of data");
             }
 
+            int stride = 1;
+
+            strides_.resize(shape.size());
+            for (int i = shape.size() - 1; i >= 0; i--) {
+                strides_[i] = stride;
+                stride *= shape[i];
+            }
+
             data_ = std::make_shared<std::vector<float>>(data);
             offset_ = 0;
         }
 
         FloatTensor::FloatTensor(std::shared_ptr<std::vector<float>> data,
-                                 const std::vector<int> &dataShape, const std::vector<int> &shape,
+                                 const std::vector<int> &strides_, const std::vector<int> &shape,
                                  int offset)
-            : data_(data), dataShape_(dataShape), shape_(shape), offset_(offset) {
+            : data_(data), strides_(strides_), shape_(shape), offset_(offset) {
             // TODO: Error checking
             for (int i = 0; i < shape.size(); i++) {
                 if (shape[i] < 1) {
@@ -55,7 +44,7 @@ namespace Tityos {
         }
 
         int FloatTensor::size() const {
-            return std::accumulate(shape_.begin(), shape_.end(), 1, std::multiplies<int>());
+            return vectorElementProduct(shape_);
         }
 
         int FloatTensor::numDims() const {
@@ -146,16 +135,19 @@ namespace Tityos {
         }
 
         bool FloatTensor::isContiguous() const {
-            bool dimMustbeSingle = false;
+            bool dimMustbeOne = false;
+            int stride = 1;
 
             for (int i = shape_.size() - 1; i >= 0; i--) {
-                if (dimMustbeSingle && shape_[i] != 1) {
+                if (stride != strides_[i]) {
+                    dimMustbeOne = true;
+                }
+
+                if (dimMustbeOne && shape_[i] != 1) {
                     return false;
                 }
 
-                if (shape_[i] != dataShape_[i]) {
-                    dimMustbeSingle = true;
-                }
+                stride *= shape_[i];
             }
 
             return true;
@@ -163,7 +155,7 @@ namespace Tityos {
 
         FloatTensor FloatTensor::contiguous() const {
             if (this->isContiguous()) {
-                return FloatTensor(data_, dataShape_, shape_, offset_);
+                return FloatTensor(data_, strides_, shape_, offset_);
             } else {
                 return this->clone();
             }
@@ -192,11 +184,9 @@ namespace Tityos {
 
         int FloatTensor::tensorIndexToFlat(std::vector<int> index) const {
             int dataIndex = offset_;
-            int stepSize = 1;
 
-            for (int i = dataShape_.size() - 1; i >= 0; i--) {
-                dataIndex += index[i] * stepSize;
-                stepSize *= dataShape_[i];
+            for (int i = 0; i < strides_.size(); i++) {
+                dataIndex += index[i] * strides_[i];
             }
 
             return dataIndex;

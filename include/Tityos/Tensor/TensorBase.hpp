@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "Tityos/Tensor/Slice.hpp"
+#include "utils.hpp"
 
 namespace Tityos {
     namespace Tensor {
