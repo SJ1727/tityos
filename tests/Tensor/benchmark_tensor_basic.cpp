@@ -14,7 +14,7 @@ TEST_CASE("Benchmark cloning data", "[tensor][basic][benchmark]") {
         data1[i] = static_cast<float>(i + 1);
     }
 
-    Tensor::FloatTensor test1(data1, {32, 128, 128});
+    Tensor::Tensor<float> test1(data1, {32, 128, 128});
 
     BENCHMARK("Large Tensor Cloning") {
         return test1.clone();

@@ -1,9 +1,9 @@
-#include "Tityos/Tensor/FloatTensor.hpp"
+#include "Tityos/Tensor/Tensor.hpp"
 
 namespace Tityos {
     namespace Tensor {
-        FloatTensor::FloatTensor(std::vector<float> data, const std::vector<int> &shape)
-            : shape_(shape) {
+        template <typename T>
+        Tensor<T>::Tensor(std::vector<T> data, const std::vector<int> &shape) : shape_(shape) {
             for (int i = 0; i < shape.size(); i++) {
                 if (shape[i] < 1) {
                     throw std::invalid_argument(std::format(
@@ -25,13 +25,13 @@ namespace Tityos {
                 stride *= shape[i];
             }
 
-            data_ = std::make_shared<std::vector<float>>(data);
+            data_ = std::make_shared<std::vector<T>>(data);
             offset_ = 0;
         }
 
-        FloatTensor::FloatTensor(std::shared_ptr<std::vector<float>> data,
-                                 const std::vector<int> &strides_, const std::vector<int> &shape,
-                                 int offset)
+        template <typename T>
+        Tensor<T>::Tensor(std::shared_ptr<std::vector<T>> data, const std::vector<int> &strides_,
+                          const std::vector<int> &shape, int offset)
             : data_(data), strides_(strides_), shape_(shape), offset_(offset) {
             // TODO: Error checking
             for (int i = 0; i < shape.size(); i++) {
@@ -43,23 +43,23 @@ namespace Tityos {
             }
         }
 
-        int FloatTensor::size() const {
+        template <typename T> int Tensor<T>::size() const {
             return vectorElementProduct(shape_);
         }
 
-        int FloatTensor::numDims() const {
+        template <typename T> int Tensor<T>::numDims() const {
             return shape_.size();
         }
 
-        std::vector<int> FloatTensor::shape() const {
+        template <typename T> std::vector<int> Tensor<T>::shape() const {
             return shape_;
         }
 
-        void FloatTensor::print() const {
+        template <typename T> void Tensor<T>::print() const {
             printRecurse(0, {});
         }
 
-        void FloatTensor::printRecurse(int dim, std::vector<int> idx) const {
+        template <typename T> void Tensor<T>::printRecurse(int dim, std::vector<int> idx) const {
             if (dim == shape_.size()) {
                 int flatIndex = tensorIndexToFlat(idx);
                 std::cout << std::setprecision(4) << (*data_)[flatIndex];
@@ -79,7 +79,7 @@ namespace Tityos {
             std::cout << "]";
         }
 
-        FloatTensor FloatTensor::at(std::vector<Slice> slices) const {
+        template <typename T> Tensor<T> Tensor<T>::at(std::vector<Slice> slices) const {
             std::vector<int> shape;
             std::vector<int> offsets;
             Slice currSlice;
@@ -121,10 +121,10 @@ namespace Tityos {
                 stepSize *= shape_[i];
             }
 
-            return FloatTensor(data_, shape_, shape, offset);
+            return Tensor<T>(data_, shape_, shape, offset);
         }
 
-        float FloatTensor::item() const {
+        template <typename T> T Tensor<T>::item() const {
             if (!std::all_of(shape_.begin(), shape_.end(), [](int x) { return x == 1; })) {
                 throw std::runtime_error("Cannot get item from tensor with more than 1 element");
             }
@@ -134,7 +134,7 @@ namespace Tityos {
             return (*data_)[tensorIndexToFlat(firstElementIndex)];
         }
 
-        bool FloatTensor::isContiguous() const {
+        template <typename T> bool Tensor<T>::isContiguous() const {
             bool dimMustbeOne = false;
             int stride = 1;
 
@@ -153,16 +153,16 @@ namespace Tityos {
             return true;
         }
 
-        FloatTensor FloatTensor::contiguous() const {
+        template <typename T> Tensor<T> Tensor<T>::contiguous() const {
             if (this->isContiguous()) {
-                return FloatTensor(data_, strides_, shape_, offset_);
+                return Tensor<T>(data_, strides_, shape_, offset_);
             } else {
                 return this->clone();
             }
         }
 
-        FloatTensor FloatTensor::clone() const {
-            std::vector<float> clonedData;
+        template <typename T> Tensor<T> Tensor<T>::clone() const {
+            std::vector<T> clonedData;
             std::vector<int> index(shape_.size(), 0);
             clonedData.resize(this->size());
 
@@ -179,10 +179,10 @@ namespace Tityos {
                 }
             }
 
-            return FloatTensor(clonedData, shape_);
+            return Tensor<T>(clonedData, shape_);
         }
 
-        int FloatTensor::tensorIndexToFlat(std::vector<int> index) const {
+        template <typename T> int Tensor<T>::tensorIndexToFlat(std::vector<int> index) const {
             int dataIndex = offset_;
 
             for (int i = 0; i < strides_.size(); i++) {
@@ -193,3 +193,8 @@ namespace Tityos {
         }
     } // namespace Tensor
 } // namespace Tityos
+
+template class Tityos::Tensor::Tensor<double>;
+template class Tityos::Tensor::Tensor<float>;
+template class Tityos::Tensor::Tensor<int>;
+template class Tityos::Tensor::Tensor<bool>;

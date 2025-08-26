@@ -6,14 +6,14 @@
 using namespace Tityos;
 
 TEST_CASE("Check tensor shape return", "[tensor][basic]") {
-    Tensor::FloatTensor t1({3, 2, 4});
+    Tensor::Tensor<float> t1({3, 2, 4});
     REQUIRE(t1.shape() == std::vector{3, 2, 4});
 
-    Tensor::FloatTensor t2({5});
+    Tensor::Tensor<float> t2({5});
     REQUIRE(t2.shape() == std::vector{5});
 
     // Empty tensor creation
-    Tensor::FloatTensor t3({});
+    Tensor::Tensor<float> t3(std::vector<int>{});
     REQUIRE(t3.shape() == std::vector<int>{});
 }
 
@@ -41,7 +41,7 @@ TEST_CASE("Access data from tensor", "[tensor][basic]") {
         data1[i] = static_cast<float>(i + 1);
     }
 
-    Tensor::FloatTensor test1(data1, {3, 2, 4});
+    Tensor::Tensor<float> test1(data1, {3, 2, 4});
 
     // Spot checks
     REQUIRE(test1.at({0, 0, 0}).item() == data1[0]);
@@ -71,8 +71,8 @@ TEST_CASE("Cloning data", "[tensor][basic][benchmark]") {
         data1[i] = static_cast<float>(i + 1);
     }
 
-    Tensor::FloatTensor test1(data1, {3, 2, 4});
-    Tensor::FloatTensor test1Clone = test1.clone();
+    Tensor::Tensor<float> test1(data1, {3, 2, 4});
+    Tensor::Tensor<float> test1Clone = test1.clone();
     std::vector<Tensor::Slice> index(test1.numDims(), 0);
 
     // Location check
@@ -89,8 +89,8 @@ TEST_CASE("Cloning data", "[tensor][basic][benchmark]") {
     }
 
     // Contiguous check
-    Tensor::FloatTensor test2 = test1.at({Tensor::Slice(1, 3), 1, Tensor::Slice(2, 3)});
-    Tensor::FloatTensor test2Cloned = test2.clone();
+    Tensor::Tensor<float> test2 = test1.at({Tensor::Slice(1, 3), 1, Tensor::Slice(2, 3)});
+    Tensor::Tensor<float> test2Cloned = test2.clone();
 
     REQUIRE(test2Cloned.isContiguous());
 }
