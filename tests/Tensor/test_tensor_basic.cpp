@@ -1,4 +1,4 @@
-#include "Tityos/Tensor/Tensor.hpp"
+#include "Tityos/tityos_all.hpp"
 #include <catch2/catch_all.hpp>
 
 #include <random>
@@ -6,20 +6,20 @@
 using namespace Tityos;
 
 TEST_CASE("Check tensor shape return", "[tensor][basic]") {
-    Tensor::Tensor<float> t1({3, 2, 4});
+    Tensor<float> t1({3, 2, 4});
     REQUIRE(t1.shape() == std::vector{3, 2, 4});
 
-    Tensor::Tensor<float> t2({5});
+    Tensor<float> t2({5});
     REQUIRE(t2.shape() == std::vector{5});
 
     // Empty tensor creation
-    Tensor::Tensor<float> t3(std::vector<int>{});
+    Tensor<float> t3(std::vector<int>{});
     REQUIRE(t3.shape() == std::vector<int>{});
 }
 
 TEST_CASE("Slice struct comparison", "[slice][basic]") {
-    Tensor::Slice s1 = 1;
-    Tensor::Slice s2(4, 5);
+    Slice s1 = 1;
+    Slice s2(4, 5);
 
     REQUIRE(s1 < 3);
     REQUIRE_FALSE(s1 < 0);
@@ -27,10 +27,10 @@ TEST_CASE("Slice struct comparison", "[slice][basic]") {
     REQUIRE(s2 < 6);
     REQUIRE_FALSE(s2 < 5);
 
-    REQUIRE(s1 == Tensor::Slice(1));
+    REQUIRE(s1 == Slice(1));
     REQUIRE(s1 != s2);
 
-    REQUIRE_THROWS_AS(Tensor::Slice(5, 4), std::invalid_argument);
+    REQUIRE_THROWS_AS(Slice(5, 4), std::invalid_argument);
 }
 
 TEST_CASE("Access data from tensor", "[tensor][basic]") {
@@ -41,7 +41,7 @@ TEST_CASE("Access data from tensor", "[tensor][basic]") {
         data1[i] = static_cast<float>(i + 1);
     }
 
-    Tensor::Tensor<float> test1(data1, {3, 2, 4});
+    Tensor<float> test1(data1, {3, 2, 4});
 
     // Spot checks
     REQUIRE(test1.at({0, 0, 0}).item() == data1[0]);
@@ -55,6 +55,9 @@ TEST_CASE("Access data from tensor", "[tensor][basic]") {
         int x = i % 4;
         REQUIRE(test1.at({z, y, x}).item() == data1[i]);
     }
+
+    // Nested access
+    REQUIRE(test1.at({Slice(1, 3), 0, 0}).at({1, 0, 0}).item() == data1[16]);
 
     // Out-of-bounds access
     REQUIRE_THROWS_AS(test1.at({3, 0, 0}), std::out_of_range);
@@ -71,9 +74,9 @@ TEST_CASE("Cloning data", "[tensor][basic][benchmark]") {
         data1[i] = static_cast<float>(i + 1);
     }
 
-    Tensor::Tensor<float> test1(data1, {3, 2, 4});
-    Tensor::Tensor<float> test1Clone = test1.clone();
-    std::vector<Tensor::Slice> index(test1.numDims(), 0);
+    Tensor<float> test1(data1, {3, 2, 4});
+    Tensor<float> test1Clone = test1.clone();
+    std::vector<Slice> index(test1.numDims(), 0);
 
     // Location check
     for (int i = 0; i < test1.size(); i++) {
@@ -89,8 +92,8 @@ TEST_CASE("Cloning data", "[tensor][basic][benchmark]") {
     }
 
     // Contiguous check
-    Tensor::Tensor<float> test2 = test1.at({Tensor::Slice(1, 3), 1, Tensor::Slice(2, 3)});
-    Tensor::Tensor<float> test2Cloned = test2.clone();
+    Tensor<float> test2 = test1.at({Slice(1, 3), 1, Slice(2, 3)});
+    Tensor<float> test2Cloned = test2.clone();
 
     REQUIRE(test2Cloned.isContiguous());
 }

@@ -1,4 +1,4 @@
-#include "Tityos/Tensor/Tensor.hpp"
+#include "Tityos/tityos_all.hpp"
 #include <catch2/catch_all.hpp>
 
 #include <random>
@@ -14,7 +14,7 @@ TEST_CASE("Benchmark cloning data", "[tensor][basic][benchmark]") {
         data1[i] = static_cast<float>(i + 1);
     }
 
-    Tensor::Tensor<float> test1(data1, {32, 128, 128});
+    Tensor<float> test1(data1, {32, 128, 128});
 
     BENCHMARK("Large Tensor Cloning") {
         return test1.clone();
