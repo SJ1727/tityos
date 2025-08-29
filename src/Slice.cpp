@@ -1,21 +1,21 @@
 #include "Tityos/Slice.hpp"
 
 namespace Tityos {
-    Slice::Slice(int start, int end, int stride) : start(start), end(end), stride(stride) {
-        if (end < start) {
-            throw std::invalid_argument(
-                std::format("End cannot be less than start in slice. {} < {}", end, start));
-        }
-    }
+    Slice::Slice(int sliceStart, int sliceEnd, int stride) : stride(stride) {
+        startOpen = false;
+        endOpen = false;
 
-    std::strong_ordering Slice::operator<=>(int v) const {
-        if (start < v && end < v) {
-            return std::strong_ordering::less;
+        start = sliceStart;
+        end = sliceEnd;
+
+        if (sliceStart == OPEN_END) {
+            startOpen = true;
+            start = 0;
         }
-        if (start > v && end > v) {
-            return std::strong_ordering::greater;
+        if (sliceEnd == OPEN_END) {
+            endOpen = true;
+            end = 0;
         }
-        return std::strong_ordering::equivalent;
     }
 
     bool Slice::operator==(const Slice &other) const {

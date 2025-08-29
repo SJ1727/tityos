@@ -17,22 +17,6 @@ TEST_CASE("Check tensor shape return", "[tensor][basic]") {
     REQUIRE(t3.shape() == std::vector<int>{});
 }
 
-TEST_CASE("Slice struct comparison", "[slice][basic]") {
-    Slice s1 = 1;
-    Slice s2(4, 5);
-
-    REQUIRE(s1 < 3);
-    REQUIRE_FALSE(s1 < 0);
-
-    REQUIRE(s2 < 6);
-    REQUIRE_FALSE(s2 < 5);
-
-    REQUIRE(s1 == Slice(1));
-    REQUIRE(s1 != s2);
-
-    REQUIRE_THROWS_AS(Slice(5, 4), std::invalid_argument);
-}
-
 TEST_CASE("Access data from tensor", "[tensor][basic]") {
     int totalSize = 3 * 2 * 4;
     std::vector<float> data1(totalSize);
@@ -47,6 +31,10 @@ TEST_CASE("Access data from tensor", "[tensor][basic]") {
     REQUIRE(test1.at({0, 0, 0}).item() == data1[0]);
     REQUIRE(test1.at({2, 1, 2}).item() == data1[22]);
     REQUIRE(test1.at({2, 1, 3}).item() == data1[23]);
+
+    // Open-end checks
+    REQUIRE(test1.at({Slice(1, OPEN_END), Slice(), Slice(OPEN_END, 2)}).shape() ==
+            std::vector<int>{2, 2, 2});
 
     // Loop-based consistency check
     for (int i = 0; i < totalSize; i++) {
@@ -65,7 +53,7 @@ TEST_CASE("Access data from tensor", "[tensor][basic]") {
     REQUIRE_THROWS_AS(test1.at({0}), std::invalid_argument);
 }
 
-TEST_CASE("Cloning data", "[tensor][basic][benchmark]") {
+TEST_CASE("Cloning tensor", "[tensor][basic]") {
     int totalSize = 3 * 2 * 4;
 
     std::vector<float> data1(totalSize);
@@ -96,4 +84,43 @@ TEST_CASE("Cloning data", "[tensor][basic][benchmark]") {
     Tensor<float> test2Cloned = test2.clone();
 
     REQUIRE(test2Cloned.isContiguous());
+}
+
+TEST_CASE("Permuting tensor", "[tensor][basic]") {
+    int totalSize = 3 * 2 * 4;
+
+    std::vector<float> data1(totalSize);
+
+    for (int i = 0; i < totalSize; i++) {
+        data1[i] = static_cast<float>(i + 1);
+    }
+
+    Tensor<float> test1Permuted(data1, {3, 2, 4});
+    Tensor<float> test1Original(data1, {3, 2, 4});
+    test1Permuted.permute({0, 2, 1});
+
+    // Permuted shape
+    REQUIRE(test1Permuted.shape() == std::vector<int>{3, 4, 2});
+
+    // Permuted access
+    REQUIRE(test1Permuted.at({2, 3, 1}).item() == test1Original.at({2, 1, 3}).item());
+}
+
+TEST_CASE("Reshape tensor", "[tensor][basic]") {
+    int totalSize = 3 * 2 * 4;
+
+    std::vector<float> data1(totalSize);
+
+    for (int i = 0; i < totalSize; i++) {
+        data1[i] = static_cast<float>(i + 1);
+    }
+
+    Tensor<float> test1Original(data1, {3, 2, 4});
+    Tensor<float> test1Reshape = test1Original.reshape({12, 2});
+
+    // Spot check
+    REQUIRE(test1Reshape.at({0, 0}).item() == 1.0f);
+    REQUIRE(test1Reshape.at({0, 1}).item() == 2.0f);
+    REQUIRE(test1Reshape.at({5, 0}).item() == 11.0f);
+    REQUIRE(test1Reshape.at({11, 1}).item() == 24.0f);
 }

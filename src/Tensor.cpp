@@ -11,13 +11,13 @@ namespace Tityos {
             }
         }
 
-        if (data.size() != std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>())) {
+        if (data.size() != vectorElementProduct(shape)) {
             throw std::invalid_argument("Shape does not fit for size of data");
         }
 
         int stride = 1;
-
         strides_.resize(shape.size());
+
         for (int i = shape.size() - 1; i >= 0; i--) {
             strides_[i] = stride;
             stride *= shape[i];
@@ -57,47 +57,34 @@ namespace Tityos {
         printRecurse(0, {});
     }
 
-    template <typename T> void Tensor<T>::printRecurse(int dim, std::vector<int> idx) const {
-        if (dim == shape_.size()) {
-            int flatIndex = tensorIndexToFlat(idx);
-            std::cout << std::setprecision(4) << (*data_)[flatIndex];
-            return;
-        }
-
-        std::cout << "[";
-        for (int i = 0; i < shape_[dim]; ++i) {
-            std::vector<int> next_idx = idx;
-            next_idx.push_back(i);
-
-            printRecurse(dim + 1, next_idx);
-            if (i < shape_[dim] - 1) {
-                std::cout << (dim == shape_.size() - 1 ? ", " : ",\n ");
-            }
-        }
-        std::cout << "]";
+    template <typename T>
+    std::shared_ptr<std::vector<T>> Tensor<T>::data() const {
+        return data_;
     }
 
-    template <typename T> Tensor<T> Tensor<T>::at(std::vector<Slice> slices) const {
+    template <typename T> Tensor<T> Tensor<T>::at(const std::vector<Slice> &slices) const {
         std::vector<int> shape;
-        Slice currSlice;
+        int start;
+        int end;
 
         if (slices.size() != shape_.size()) {
             throw std::invalid_argument(
-                std::format("Too many indices provided: Tensor has dim {} but {} "
+                std::format("Number of indices does not match dimensionality: Tensor has "
+                            "dimensionality {} but {} "
                             "indices where provided",
                             shape_.size(), slices.size()));
         }
 
         for (int i = 0; i < slices.size(); i++) {
-            // TODO: Change this for when open ended ranges
-            if (slices[i] < 0) {
+            // TODO: Allow neagtive indices
+            if (slices[i].start < 0 || slices[i].end < 0) {
                 throw std::runtime_error(std::format(
                     "Indices must be positive: Index at position {} is less than 0", i));
             }
 
             if (slices[i].start >= shape_[i] || slices[i].end > shape_[i]) {
                 throw std::out_of_range(
-                    std::format("Index out of range. Cannot access range {}:{} from dim of size {}",
+                    std::format("Index out of range. Cannot access range {}:{} from dim of size{}",
                                 slices[i].start, slices[i].end, shape_[i]));
             }
         }
@@ -105,11 +92,14 @@ namespace Tityos {
         shape.resize(slices.size());
         int offset = offset_;
 
-        for (int i = slices.size() - 1; i >= 0; i--) {
-            currSlice = slices[i];
+        // Calculating shape and offsets of slice
+        for (int i = 0; i < slices.size(); i++) {
+            // Handles open ends
+            start = slices[i].startOpen ? 0 : slices[i].start;
+            end = slices[i].endOpen ? shape_[i] : slices[i].end;
 
-            shape[i] = currSlice.end - currSlice.start;
-            offset += (currSlice.start) * strides_[i];
+            shape[i] = end - start;
+            offset += start * strides_[i];
         }
 
         return Tensor<T>(data_, strides_, shape, offset);
@@ -122,23 +112,23 @@ namespace Tityos {
 
         std::vector<int> firstElementIndex(shape_.size(), 0);
 
-        return (*data_)[tensorIndexToFlat(firstElementIndex)];
+        return (*data_)[getFlatIndex(firstElementIndex)];
     }
 
     template <typename T> bool Tensor<T>::isContiguous() const {
-        bool dimMustbeOne = false;
-        int stride = 1;
+        bool mismatchFound = false;
+        int expectedStride = 1;
 
         for (int i = shape_.size() - 1; i >= 0; i--) {
-            if (stride != strides_[i]) {
-                dimMustbeOne = true;
+            if (expectedStride != strides_[i]) {
+                mismatchFound = true;
             }
 
-            if (dimMustbeOne && shape_[i] != 1) {
+            if (mismatchFound && shape_[i] != 1) {
                 return false;
             }
 
-            stride *= shape_[i];
+            expectedStride *= shape_[i];
         }
 
         return true;
@@ -153,13 +143,52 @@ namespace Tityos {
     }
 
     template <typename T> Tensor<T> Tensor<T>::clone() const {
-        std::vector<T> clonedData;
+        return Tensor<T>(this->getDataFlat(), shape_);
+    }
+
+    template <typename T> void Tensor<T>::permute(const std::vector<int> &dims) {
+        std::vector<int> newShape(this->numDims(), 0);
+        std::vector<int> newStrides(this->numDims(), 0);
+
+        for (int i = 0; i < dims.size(); i++) {
+            newShape[i] = shape_[dims[i]];
+            newStrides[i] = strides_[dims[i]];
+        }
+
+        shape_ = newShape;
+        strides_ = newStrides;
+    }
+
+    template <typename T> void Tensor<T>::transpose(int dim1, int dim2) {
+        std::vector<int> permuteInput(this->numDims());
+
+        for (int i = 0; i < this->size(); i++) {
+            permuteInput[i] = i;
+        }
+
+        // Swap the two dims but keep all others the same
+        permuteInput[dim1] = dim2;
+        permuteInput[dim2] = dim1;
+
+        permute(permuteInput);
+    }
+
+    template <typename T> void Tensor<T>::transpose() {
+        transpose(this->numDims() - 1, this->numDims() - 2);
+    }
+
+    template <typename T> Tensor<T> Tensor<T>::reshape(const std::vector<int> &newShape) {
+        return Tensor<T>(this->getDataFlat(), newShape);
+    }
+
+    template <typename T> std::vector<T> Tensor<T>::getDataFlat() const {
+        std::vector<T> flattendData;
         std::vector<int> index(shape_.size(), 0);
-        clonedData.resize(this->size());
+        flattendData.resize(this->size());
 
         // Loops through the data such that the result is contiguous
         for (int i = 0; i < this->size(); i++) {
-            clonedData[i] = (*data_)[tensorIndexToFlat(index)];
+            flattendData[i] = (*data_)[getFlatIndex(index)];
 
             for (int j = shape_.size() - 1; j >= 0; j--) {
                 index[j]++;
@@ -170,10 +199,10 @@ namespace Tityos {
             }
         }
 
-        return Tensor<T>(clonedData, shape_);
+        return flattendData;
     }
 
-    template <typename T> int Tensor<T>::tensorIndexToFlat(std::vector<int> index) const {
+    template <typename T> int Tensor<T>::getFlatIndex(const std::vector<int> &index) const {
         int dataIndex = offset_;
 
         for (int i = 0; i < strides_.size(); i++) {
@@ -181,6 +210,26 @@ namespace Tityos {
         }
 
         return dataIndex;
+    }
+
+    template <typename T> void Tensor<T>::printRecurse(int dim, std::vector<int> idx) const {
+        if (dim == shape_.size()) {
+            int flatIndex = getFlatIndex(idx);
+            std::cout << std::setprecision(4) << (*data_)[flatIndex];
+            return;
+        }
+
+        std::cout << "[";
+        for (int i = 0; i < shape_[dim]; i++) {
+            std::vector<int> next_idx = idx;
+            next_idx.push_back(i);
+
+            printRecurse(dim + 1, next_idx);
+            if (i < shape_[dim] - 1) {
+                std::cout << (dim == shape_.size() - 1 ? ", " : ",\n ");
+            }
+        }
+        std::cout << "]";
     }
 } // namespace Tityos
 

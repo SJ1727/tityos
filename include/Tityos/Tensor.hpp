@@ -28,16 +28,24 @@ namespace Tityos {
         int numDims() const;
         std::vector<int> shape() const;
         void print() const;
+        std::shared_ptr<std::vector<T>> data() const;
 
-        Tensor<T> at(std::vector<Slice> slices) const;
+        Tensor<T> at(const std::vector<Slice> &slices) const;
         T item() const;
 
         bool isContiguous() const;
         Tensor<T> contiguous() const;
         Tensor<T> clone() const;
 
+        void permute(const std::vector<int> &dims);
+        void transpose(int dim1, int dim2);
+        void transpose();
+
+        Tensor<T> reshape(const std::vector<int> &newShape);
+
       protected:
-        int tensorIndexToFlat(std::vector<int> index) const;
+        std::vector<T> getDataFlat() const;
+        int getFlatIndex(const std::vector<int> &index) const;
         void printRecurse(int dim, std::vector<int> idx) const;
 
       protected:
