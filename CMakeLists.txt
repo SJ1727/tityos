@@ -1,19 +1,23 @@
 cmake_minimum_required(VERSION 3.15)
 project(tityos LANGUAGES CXX)
 
+include(CTest)
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.tpp")
+set(TY_ROOT_DIR ${PROJECT_SOURCE_DIR}/tityos)
 
-add_library(tityos STATIC
-    ${SOURCES}
+# file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.tpp")
+
+add_library(tityos)
+
+target_include_directories(
+    tityos
+    PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
 )
 
-target_include_directories(tityos PUBLIC
-    ${PROJECT_SOURCE_DIR}/include
-)
-
-include(CTest)
+include(${TY_ROOT_DIR}/ty/CMakeLists.txt)
 
 add_subdirectory(tests)

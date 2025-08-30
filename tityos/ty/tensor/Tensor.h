@@ -10,27 +10,28 @@
 #include <stdexcept>
 #include <vector>
 
-#include "Tityos/Slice.hpp"
-#include "utils.hpp"
+#include "tityos/ty/common/utils.h"
+#include "tityos/ty/tensor/Index.h"
+#include "tityos/ty/tensor/Shape.h"
 
-namespace Tityos {
+namespace ty {
 
     template <typename T> class Tensor {
       public:
-        Tensor(const std::vector<int> &shape)
-            : Tensor(std::vector<T>(vectorElementProduct(shape), 0.0f), shape) {}
-        Tensor(std::vector<T> data, const std::vector<int> &shape);
+        Tensor(const Shape &shape)
+            : Tensor(std::vector<T>(shape.numElements(), 0.0f), shape) {}
+        Tensor(std::vector<T> data, const Shape &shape);
         Tensor(std::shared_ptr<std::vector<T>> data, const std::vector<int> &strides,
-               const std::vector<int> &shape, int offset);
+               const Shape &shape, int offset);
+        Tensor(T value) : Tensor({value}, Shape({1})) {}
         virtual ~Tensor() = default;
 
-        int size() const;
-        int numDims() const;
-        std::vector<int> shape() const;
+        Shape shape() const;
         void print() const;
         std::shared_ptr<std::vector<T>> data() const;
 
-        Tensor<T> at(const std::vector<Slice> &slices) const;
+        Tensor<T> at(const std::vector<Index> &slices) const;
+        T itemAt(const std::vector<int> &index) const;
         T item() const;
 
         bool isContiguous() const;
@@ -41,7 +42,9 @@ namespace Tityos {
         void transpose(int dim1, int dim2);
         void transpose();
 
-        Tensor<T> reshape(const std::vector<int> &newShape);
+        Tensor<T> reshape(const Shape &newShape);
+
+        void operator=(const Tensor<T> &other);
 
       protected:
         std::vector<T> getDataFlat() const;
@@ -49,9 +52,9 @@ namespace Tityos {
         void printRecurse(int dim, std::vector<int> idx) const;
 
       protected:
-        std::vector<int> shape_;
+        Shape shape_;
         int offset_;
         std::vector<int> strides_;
         std::shared_ptr<std::vector<T>> data_;
     };
-} // namespace Tityos
+} // namespace ty

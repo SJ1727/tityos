@@ -1,9 +1,9 @@
-#include "Tityos/tityos_all.hpp"
+#include "tityos/ty/tityos.h"
 #include <catch2/catch_all.hpp>
 
 #include <random>
 
-using namespace Tityos;
+using namespace ty;
 
 TEST_CASE("Benchmark acessing data", "[tensor][basic][benchmark]") {
     int totalSize = 8 * 8 * 8;
