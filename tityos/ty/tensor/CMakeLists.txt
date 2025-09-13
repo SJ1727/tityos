@@ -4,6 +4,8 @@ target_sources(
     tityos
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/Tensor.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Index.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/DType.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Shape.cpp
 )
+
+include(${CMAKE_CURRENT_LIST_DIR}/backend/CMakeLists.txt)

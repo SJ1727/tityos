@@ -8,8 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(TY_ROOT_DIR ${PROJECT_SOURCE_DIR}/tityos)
 
-# file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.tpp")
-
 add_library(tityos)
 
 target_include_directories(

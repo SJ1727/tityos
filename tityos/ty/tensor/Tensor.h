@@ -1,60 +1,76 @@
 #pragma once
 
-#include <algorithm>
-#include <compare>
-#include <format>
-#include <iomanip>
-#include <iostream>
+#include <array>
+#include <cstdint>
+#include <cstring>
 #include <memory>
-#include <numeric>
-#include <stdexcept>
 #include <vector>
 
-#include "tityos/ty/common/utils.h"
-#include "tityos/ty/tensor/Index.h"
+#include "tityos/ty/tensor/DType.h"
+#include "tityos/ty/tensor/Device.h"
 #include "tityos/ty/tensor/Shape.h"
+#include "tityos/ty/tensor/backend/Storage.h"
 
 namespace ty {
-
-    template <typename T> class Tensor {
-      public:
-        Tensor(const Shape &shape)
-            : Tensor(std::vector<T>(shape.numElements(), 0.0f), shape) {}
-        Tensor(std::vector<T> data, const Shape &shape);
-        Tensor(std::shared_ptr<std::vector<T>> data, const std::vector<int> &strides,
-               const Shape &shape, int offset);
-        Tensor(T value) : Tensor({value}, Shape({1})) {}
-        virtual ~Tensor() = default;
-
-        Shape shape() const;
-        void print() const;
-        std::shared_ptr<std::vector<T>> data() const;
-
-        Tensor<T> at(const std::vector<Index> &slices) const;
-        T itemAt(const std::vector<int> &index) const;
-        T item() const;
-
-        bool isContiguous() const;
-        Tensor<T> contiguous() const;
-        Tensor<T> clone() const;
-
-        void permute(const std::vector<int> &dims);
-        void transpose(int dim1, int dim2);
-        void transpose();
-
-        Tensor<T> reshape(const Shape &newShape);
-
-        void operator=(const Tensor<T> &other);
-
-      protected:
-        std::vector<T> getDataFlat() const;
-        int getFlatIndex(const std::vector<int> &index) const;
-        void printRecurse(int dim, std::vector<int> idx) const;
-
-      protected:
+    class Tensor {
+      private:
+        std::shared_ptr<Storage> dataStorage_;
         Shape shape_;
-        int offset_;
-        std::vector<int> strides_;
-        std::shared_ptr<std::vector<T>> data_;
+        std::array<int64_t, tensorMaxDims> strides_;
+        int64_t offset_;
+
+      public:
+        Tensor(Shape shape, DType dtype = ty::DType::float32);
+
+        Tensor(const Tensor &tensor) = default;
+        Tensor(Tensor &&tensor) noexcept = default;
+
+        template <typename Type>
+        Tensor(Type *data, Shape shape, DType dtype = ty::DType::float32)
+            : shape_(shape), offset_(0) {
+            if (sizeof(Type) != dtypeSize(dtype)) {
+                throw std::runtime_error(
+                    "Datatype size of data does not match size of tensor datatype");
+            }
+
+            calculateStrides();
+
+            // Copying the data
+            dataStorage_ =
+                std::make_shared<Storage>(shape_.numElements() * dtypeSize(dtype), dtype);
+            std::memcpy(dataStorage_->get(0), data, shape_.numElements() * dtypeSize(dtype));
+        }
+
+        template <typename Type>
+        Tensor(const std::vector<Type> &data, Shape shape, DType dtype = ty::DType::float32)
+            : Tensor(data.data(), shape, dtype) {}
+
+        Tensor &operator=(const Tensor &other) = default;
+        Tensor &operator=(Tensor &&other) noexcept = default;
+
+        ~Tensor() = default;
+
+        Shape shape() const {
+            return shape_;
+        }
+
+        std::array<int64_t, tensorMaxDims> strides() const {
+            return strides_;
+        }
+
+        int64_t offset() const {
+            return offset_;
+        }
+
+        DType dtype() const {
+            return dataStorage_->dtype();
+        }
+
+        Device device() const {
+            return dataStorage_->device();
+        }
+
+      private:
+        void calculateStrides();
     };
 } // namespace ty

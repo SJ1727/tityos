@@ -1,28 +1,40 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <numeric>
 #include <stdexcept>
-#include <vector>
 
 namespace ty {
+    constexpr size_t tensorMaxDims = 64;
+
     class Shape {
+      private:
+        std::array<int64_t, tensorMaxDims> dims_;
+        size_t numDims_;
+
       public:
-        explicit Shape(std::vector<int> dims);
-        Shape(std::initializer_list<int> dims);
+        Shape();
+
+        Shape(const Shape &shape) : dims_(shape.dims_), numDims_(shape.numDims_) {}
+
+        Shape(std::initializer_list<int64_t> dims);
+
         ~Shape() = default;
 
-        int numDims() const;
+        inline size_t numDims() const {
+            return numDims_;
+        }
 
-        int numElements() const;
+        inline int64_t numElements() const {
+            return std::accumulate(dims_.begin(), dims_.end(), 1, std::multiplies<int>());
+        }
 
-        int dim(const size_t dim) const;
+        int64_t &operator[](size_t index);
+        const int64_t &operator[](size_t index) const;
 
-        int &operator[](const size_t dim);
-
-        bool operator==(const Shape &other) const;
-        bool operator==(const std::initializer_list<int> &other) const;
-
-      private:
-        std::vector<int> dims_;
+        void operator=(const Shape &shape);
+        void operator=(Shape &&shape);
     };
-} // namespace ty
+}; // namespace ty
