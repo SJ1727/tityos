@@ -1,8 +1,8 @@
 #pragma once
 
-#include <numeric>
-#include <vector>
+#include "tityos/ty/common/assert.h"
+#include "tityos/ty/tensor/tensor.h"
 
-namespace Tityos {
-
+namespace ty {
+    Shape broadcastCombineShapes(const Shape &shape1, const Shape &shape2);
 }

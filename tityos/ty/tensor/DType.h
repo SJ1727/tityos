@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 namespace ty {
     enum class DType : int {
@@ -20,4 +21,6 @@ namespace ty {
     };
 
     size_t dtypeSize(DType type);
+
+    std::string dtypeAsString(DType type);
 };

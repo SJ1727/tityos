@@ -1,13 +1,25 @@
 #include "tityos/ty/tensor/Shape.h"
 
+#include <iostream>
+
 namespace ty {
     Shape::Shape() {
-        dims_.fill(-1);
+        dims_.fill(1);
         numDims_ = 0;
     }
 
     Shape::Shape(std::initializer_list<int64_t> dims) {
-        dims_.fill(-1);
+        dims_.fill(1);
+        numDims_ = 0;
+
+        for (int64_t dim : dims) {
+            dims_[numDims_] = dim;
+            numDims_++;
+        }
+    }
+
+    Shape::Shape(const std::vector<int64_t> &dims) {
+        dims_.fill(1);
         numDims_ = 0;
 
         for (int64_t dim : dims) {

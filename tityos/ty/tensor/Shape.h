@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <numeric>
 #include <stdexcept>
+#include <vector>
 
 namespace ty {
     constexpr size_t tensorMaxDims = 64;
@@ -21,6 +22,8 @@ namespace ty {
 
         Shape(std::initializer_list<int64_t> dims);
 
+        Shape(const std::vector<int64_t> &dims);
+
         ~Shape() = default;
 
         inline size_t numDims() const {
@@ -29,6 +32,10 @@ namespace ty {
 
         inline int64_t numElements() const {
             return std::accumulate(dims_.begin(), dims_.end(), 1, std::multiplies<int>());
+        }
+
+        inline const std::array<int64_t, tensorMaxDims>& array() const {
+            return dims_;
         }
 
         int64_t &operator[](size_t index);

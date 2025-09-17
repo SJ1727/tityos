@@ -6,7 +6,7 @@ set(CUDA_DIR ${CMAKE_CURRENT_LIST_DIR}/cuda)
 target_sources(
     tityos
     PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/Addition.cpp
-    ${CPU_DIR}/Addition.cpp
-    ${CUDA_DIR}/Addition.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/BinaryOps.cpp
+    ${CPU_DIR}/BinaryOps.cpp
+    ${CUDA_DIR}/BinaryOps.cpp
 )

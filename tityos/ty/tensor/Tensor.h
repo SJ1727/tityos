@@ -50,11 +50,27 @@ namespace ty {
 
         ~Tensor() = default;
 
+        void* get(size_t idx) {
+            return dataStorage_->get(idx);
+        }
+
+        const void* get(size_t idx) const {
+            return dataStorage_->get(idx);
+        }
+
         Shape shape() const {
             return shape_;
         }
 
-        std::array<int64_t, tensorMaxDims> strides() const {
+        size_t numDims() const {
+            return shape_.numDims();
+        }
+
+        int64_t numElements() const {
+            return shape_.numElements();
+        }
+
+        const std::array<int64_t, tensorMaxDims> &strides() const {
             return strides_;
         }
 
