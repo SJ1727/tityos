@@ -1,11 +1,13 @@
 <div align="center">
   <img src="logo.png" alt="Logo" width="500"/>
   
-<h2>
+<h1>
     <strong>
         Tityos
     </strong>
-</h2>
+</h1>
 </div>
 
-Tityos is a deep learning library built for C++. [...]
+<div align="center">
+<strong>A deep learning library built for C++</strong>
+</div>
