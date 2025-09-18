@@ -50,53 +50,57 @@ namespace ty {
     }
 
     Tensor cpuAdd(Tensor &tensor1, Tensor &tensor2) {
-        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()));
+        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
+                      tensor1.dtype());
         TensorIterator iter;
 
         iter.binaryOperationIteration(result, tensor1, tensor2);
 
         TITYOS_BINARY_OP_FOREACH_SWITCH(
             +, iter, tensor1.dtype(),
-            std::format("Cannot add tensors of type {}", dtypeAsString(tensor1.dtype())));
+            std::format("Cannot add tensors of type {}", dtypeToString(tensor1.dtype())));
 
         return result;
     }
 
     Tensor cpuSubtract(Tensor &tensor1, Tensor &tensor2) {
-        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()));
+        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
+                      tensor1.dtype());
         TensorIterator iter;
 
         iter.binaryOperationIteration(result, tensor1, tensor2);
 
         TITYOS_BINARY_OP_FOREACH_SWITCH(
             -, iter, tensor1.dtype(),
-            std::format("Cannot subtract tensors of type {}", dtypeAsString(tensor1.dtype())));
+            std::format("Cannot subtract tensors of type {}", dtypeToString(tensor1.dtype())));
 
         return result;
     }
 
     Tensor cpuMultiply(Tensor &tensor1, Tensor &tensor2) {
-        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()));
+        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
+                      tensor1.dtype());
         TensorIterator iter;
 
         iter.binaryOperationIteration(result, tensor1, tensor2);
 
         TITYOS_BINARY_OP_FOREACH_SWITCH(*, iter, tensor1.dtype(),
                                         std::format("Cannot multiply tensors of type {}",
-                                                    dtypeAsString(tensor1.dtype())));
+                                                    dtypeToString(tensor1.dtype())));
 
         return result;
     }
 
     Tensor cpuDivide(Tensor &tensor1, Tensor &tensor2) {
-        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()));
+        Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
+                      tensor1.dtype());
         TensorIterator iter;
 
         iter.binaryOperationIteration(result, tensor1, tensor2);
 
         TITYOS_BINARY_OP_FOREACH_SWITCH(
             /, iter, tensor1.dtype(),
-            std::format("Cannot divide tensors of type {}", dtypeAsString(tensor1.dtype())));
+            std::format("Cannot divide tensors of type {}", dtypeToString(tensor1.dtype())));
 
         return result;
     }

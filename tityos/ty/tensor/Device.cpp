@@ -4,7 +4,7 @@ namespace ty {
     std::string deviceToString(Device device) {
         std::string deviceType = "";
 
-        switch (device.type) {
+        switch (device.type()) {
         case DeviceType::CPU:
             deviceType = "cpu";
             break;
@@ -15,6 +15,12 @@ namespace ty {
             break;
         }
 
-        return std::format("{}:{}", deviceType, device.index);
+        // With index
+        if (device.index() != -1) {
+            return std::format("{}:{}", deviceType, device.index());
+        }
+
+        // No index
+        return std::format("{}", deviceType);
     }
-}
+} // namespace ty

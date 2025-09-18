@@ -6,13 +6,14 @@
 #include <memory>
 #include <vector>
 
+#include "tityos/ty/common/defines.h"
 #include "tityos/ty/tensor/DType.h"
 #include "tityos/ty/tensor/Device.h"
 #include "tityos/ty/tensor/Shape.h"
 #include "tityos/ty/tensor/backend/Storage.h"
 
 namespace ty {
-    class Tensor {
+    class TITYOS_API Tensor {
       private:
         std::shared_ptr<Storage> dataStorage_;
         Shape shape_;

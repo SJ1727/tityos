@@ -7,10 +7,12 @@
 #include <stdexcept>
 #include <vector>
 
+#include "tityos/ty/common/defines.h"
+
 namespace ty {
     constexpr size_t tensorMaxDims = 64;
 
-    class Shape {
+    class TITYOS_API Shape {
       private:
         std::array<int64_t, tensorMaxDims> dims_;
         size_t numDims_;

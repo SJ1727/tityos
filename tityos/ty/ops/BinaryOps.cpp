@@ -5,7 +5,7 @@ namespace ty {
         assertSameDevice(tensor1, tensor2);
         assertBroadcastable(tensor1.shape(), tensor2.shape());
 
-        switch (tensor1.device().type) {
+        switch (tensor1.device().type()) {
         case DeviceType::CPU:
             return cpuAdd(tensor1, tensor2);
         case DeviceType::CUDA:
@@ -21,7 +21,7 @@ namespace ty {
         assertSameDevice(tensor1, tensor2);
         assertBroadcastable(tensor1.shape(), tensor2.shape());
 
-        switch (tensor1.device().type) {
+        switch (tensor1.device().type()) {
         case DeviceType::CPU:
             return cpuSubtract(tensor1, tensor2);
         case DeviceType::CUDA:
@@ -37,7 +37,7 @@ namespace ty {
         assertSameDevice(tensor1, tensor2);
         assertBroadcastable(tensor1.shape(), tensor2.shape());
 
-        switch (tensor1.device().type) {
+        switch (tensor1.device().type()) {
         case DeviceType::CPU:
             return cpuMultiply(tensor1, tensor2);
         case DeviceType::CUDA:
@@ -53,7 +53,7 @@ namespace ty {
         assertSameDevice(tensor1, tensor2);
         assertBroadcastable(tensor1.shape(), tensor2.shape());
 
-        switch (tensor1.device().type) {
+        switch (tensor1.device().type()) {
         case DeviceType::CPU:
             return cpuDivide(tensor1, tensor2);
         case DeviceType::CUDA:

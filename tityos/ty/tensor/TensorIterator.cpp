@@ -1,6 +1,11 @@
 #include "tityos/ty/tensor/TensorIterator.h"
 
 namespace ty {
+    void TensorIterator::unaryOperationIteration(Tensor &out, Tensor &in) {
+        this->addOutput(out);
+        this->addInput(in);
+    }
+
     void TensorIterator::binaryOperationIteration(Tensor &out, Tensor &in1, Tensor &in2) {
         this->addOutput(out);
         this->addInput(in1);
@@ -18,9 +23,9 @@ namespace ty {
         for (int64_t i = 0; i < total; i++) {
             // Calculating the pointer to the correct element in each tensor (input and output)
             for (int j = 0; j < args.size(); j++) {
-                idx = 0;
+                idx = operands_[j].tensor.offset();
 
-                for (int k = 0; k < tensorMaxDims; k++) {
+                for (int k = 0; k < operands_[j].tensor.numDims(); k++) {
                     if (operands_[j].tensor.shape().array()[k] != 1) {
                         idx += iterIndex[k] * operands_[j].tensor.strides()[k];
                     }

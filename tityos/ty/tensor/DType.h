@@ -4,8 +4,10 @@
 #include <cstdint>
 #include <string>
 
+#include "tityos/ty/common/defines.h"
+
 namespace ty {
-    enum class DType : int {
+    enum class TITYOS_API DType : int {
         float16 = 0,
         float32 = 1,
         float64 = 2,
@@ -22,5 +24,5 @@ namespace ty {
 
     size_t dtypeSize(DType type);
 
-    std::string dtypeAsString(DType type);
+    std::string dtypeToString(DType type);
 };

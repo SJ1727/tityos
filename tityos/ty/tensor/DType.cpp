@@ -33,7 +33,7 @@ namespace ty {
         }
     }
 
-    std::string dtypeAsString(DType type) {
+    std::string dtypeToString(DType type) {
         switch (type) {
         case DType::float16: // No native c++ support for float16. Will deal with this some other day
             return "Float16";

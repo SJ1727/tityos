@@ -31,23 +31,23 @@ namespace ty {
     }
 
     void Storage::allocate() {
-        if (device_.type == ty::DeviceType::CPU) {
+        if (device_.isCpu()) {
             dataPtr_ = malloc(numBytes_);
 
             if (dataPtr_ == NULL) {
                 throw std::bad_alloc();
             }
-        } else if (device_.type == ty::DeviceType::CUDA) {
+        } else if (device_.isCuda()) {
             /* Not Implemented */
         }
     }
 
     void Storage::deallocate() {
-        if (device_.type == ty::DeviceType::CPU) {
+        if (device_.isCpu()) {
             if (dataPtr_ != nullptr) {
                 free(dataPtr_);
             }
-        } else if (device_.type == ty::DeviceType::CUDA) {
+        } else if (device_.isCuda()) {
             /* Not Implemented */
         } 
     }

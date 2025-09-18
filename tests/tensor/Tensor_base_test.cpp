@@ -3,13 +3,16 @@
 #include "tityos/ty/tityos.h"
 
 TEST_CASE("Tensor creation", "[tensor][base]") {
-    std::vector<float> testData(48, 0.0f);
+    std::vector<float> testData1(48, 0.0f);
+    std::vector<int64_t> testData2(48, 0);
 
-    REQUIRE_NOTHROW([&]() { ty::Tensor test(testData, ty::Shape({8, 6})); });
-    REQUIRE_NOTHROW([&]() { ty::Tensor test(testData, ty::Shape({1, 1, 8, 6})); });
-    REQUIRE_NOTHROW([&]() { ty::Tensor test(testData, ty::Shape({2, 1, 4, 6})); });
+    REQUIRE_NOTHROW([&]() { ty::Tensor test(testData1, ty::Shape({8, 6})); });
+    REQUIRE_NOTHROW([&]() { ty::Tensor test(testData1, ty::Shape({1, 1, 8, 6})); });
+    REQUIRE_NOTHROW([&]() { ty::Tensor test(testData1, ty::Shape({2, 1, 4, 6})); });
 
-    ty::Tensor test(testData, ty::Shape({1, 8, 6}));
+    REQUIRE_NOTHROW([&]() { ty::Tensor test(testData2, ty::Shape({8, 6}), ty::DType::int64); });
+
+    ty::Tensor test(testData1, ty::Shape({1, 8, 6}));
 
     REQUIRE(test.numElements() == 48);
 }

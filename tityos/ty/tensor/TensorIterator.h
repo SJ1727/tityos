@@ -30,6 +30,8 @@ namespace ty {
             operands_.push_back(OperandInfo({tensor, OperandType::INPUT}));
         }
 
+        void unaryOperationIteration(Tensor &out, Tensor &in);
+
         void binaryOperationIteration(Tensor &out, Tensor &in1, Tensor &in2);
 
         int64_t numElements() const {
