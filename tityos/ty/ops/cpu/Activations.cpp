@@ -3,25 +3,19 @@
 #define TITYOS_UNARY_OP_FOREACH(TYPE, OP, iter)                                                    \
     iter.forEach([](std::vector<void *> args) {                                                    \
         TYPE *out = static_cast<TYPE *>(args[0]);                                                  \
-        TYPE *in1 = static_cast<TYPE *>(args[1]);                                                  \
-        TYPE *in2 = static_cast<TYPE *>(args[2]);                                                  \
-        *out = (*in1)OP(*in2);                                                                     \
+        TYPE *in = static_cast<TYPE *>(args[1]);                                                   \
+        OP;                                                                                        \
     })
 
 namespace ty {
     Tensor cpuRelu(Tensor &tensor) {
-        Tensor result(tensor.shape());
-        TensorIterator iter;
+        Tensor result(tensor.shape(), tensor.dtype());
+        TensorIterator iter = unaryOperationIterator(result, tensor);
 
-        iter.unaryOperationIteration(result, tensor);
-
-        if (tensor.dtype() == DType::float32) {
-            iter.forEach([](std::vector<void *> args) {
-                float *out = static_cast<float *>(args[0]);
-                float *in = static_cast<float *>(args[1]);
-                *out = *in > 0 ? *in : 0;
-            });
-        }
+        TITYOS_TYPED_FUNC_SWITCH(
+            tensor.dtype(),
+            std::format("Cannot apply relu to tensor of type {}", dtypeToString(tensor.dtype())),
+            TITYOS_UNARY_OP_FOREACH, *out = *in > 0 ? *in : 0, iter);
 
         return result;
     }

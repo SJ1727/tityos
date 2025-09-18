@@ -1,15 +1,23 @@
 #include "tityos/ty/tensor/TensorIterator.h"
 
 namespace ty {
-    void TensorIterator::unaryOperationIteration(Tensor &out, Tensor &in) {
-        this->addOutput(out);
-        this->addInput(in);
+    TensorIterator unaryOperationIteration(Tensor &out, Tensor &in) {
+        TensorIterator iter;
+
+        iter.addOutput(out);
+        iter.addInput(in);
+
+        return iter;
     }
 
-    void TensorIterator::binaryOperationIteration(Tensor &out, Tensor &in1, Tensor &in2) {
-        this->addOutput(out);
-        this->addInput(in1);
-        this->addInput(in2);
+    TensorIterator binaryOperationIteration(Tensor &out, Tensor &in1, Tensor &in2) {
+        TensorIterator iter;
+
+        iter.addOutput(out);
+        iter.addInput(in1);
+        iter.addInput(in2);
+
+        return iter;
     }
 
     void TensorIterator::forEach(std::function<void(std::vector<void *> &)> func) {

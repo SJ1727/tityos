@@ -10,55 +10,15 @@ namespace ty {
         *out = (*in1)OP(*in2);                                                                     \
     })
 
-#define TITYOS_BINARY_OP_FOREACH_SWITCH(OP, iter, dtype, errMessage)                               \
-    switch (dtype) {                                                                               \
-    case DType::float16:                                                                           \
-        TITYOS_BINARY_OP_FOREACH(uint16_t, OP, iter);                                              \
-        break;                                                                                     \
-    case DType::float32:                                                                           \
-        TITYOS_BINARY_OP_FOREACH(float, OP, iter);                                                 \
-        break;                                                                                     \
-    case DType::float64:                                                                           \
-        TITYOS_BINARY_OP_FOREACH(double, OP, iter);                                                \
-        break;                                                                                     \
-    case DType::int8:                                                                              \
-        TITYOS_BINARY_OP_FOREACH(int8_t, OP, iter);                                                \
-        break;                                                                                     \
-    case DType::int16:                                                                             \
-        TITYOS_BINARY_OP_FOREACH(int16_t, OP, iter);                                               \
-        break;                                                                                     \
-    case DType::int32:                                                                             \
-        TITYOS_BINARY_OP_FOREACH(int32_t, OP, iter);                                               \
-        break;                                                                                     \
-    case DType::int64:                                                                             \
-        TITYOS_BINARY_OP_FOREACH(int64_t, OP, iter);                                               \
-        break;                                                                                     \
-    case DType::uint8:                                                                             \
-        TITYOS_BINARY_OP_FOREACH(uint8_t, OP, iter);                                               \
-        break;                                                                                     \
-    case DType::uint16:                                                                            \
-        TITYOS_BINARY_OP_FOREACH(uint16_t, OP, iter);                                              \
-        break;                                                                                     \
-    case DType::uint32:                                                                            \
-        TITYOS_BINARY_OP_FOREACH(uint32_t, OP, iter);                                              \
-        break;                                                                                     \
-    case DType::uint64:                                                                            \
-        TITYOS_BINARY_OP_FOREACH(uint64_t, OP, iter);                                              \
-        break;                                                                                     \
-    default:                                                                                       \
-        throw std::runtime_error(errMessage);                                                      \
-    }
-
     Tensor cpuAdd(Tensor &tensor1, Tensor &tensor2) {
         Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
                       tensor1.dtype());
-        TensorIterator iter;
+        TensorIterator iter = binaryOperationIterator(result, tensor1, tensor2);
 
-        iter.binaryOperationIteration(result, tensor1, tensor2);
-
-        TITYOS_BINARY_OP_FOREACH_SWITCH(
-            +, iter, tensor1.dtype(),
-            std::format("Cannot add tensors of type {}", dtypeToString(tensor1.dtype())));
+        TITYOS_TYPED_FUNC_SWITCH(
+            tensor1.dtype(),
+            std::format("Cannot add tensors of type {}", dtypeToString(tensor1.dtype())),
+            TITYOS_BINARY_OP_FOREACH, +, iter);
 
         return result;
     }
@@ -66,13 +26,12 @@ namespace ty {
     Tensor cpuSubtract(Tensor &tensor1, Tensor &tensor2) {
         Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
                       tensor1.dtype());
-        TensorIterator iter;
+        TensorIterator iter = binaryOperationIterator(result, tensor1, tensor2);
 
-        iter.binaryOperationIteration(result, tensor1, tensor2);
-
-        TITYOS_BINARY_OP_FOREACH_SWITCH(
-            -, iter, tensor1.dtype(),
-            std::format("Cannot subtract tensors of type {}", dtypeToString(tensor1.dtype())));
+        TITYOS_TYPED_FUNC_SWITCH(
+            tensor1.dtype(),
+            std::format("Cannot subtract tensors of type {}", dtypeToString(tensor1.dtype())),
+            TITYOS_BINARY_OP_FOREACH, -, iter);
 
         return result;
     }
@@ -80,13 +39,12 @@ namespace ty {
     Tensor cpuMultiply(Tensor &tensor1, Tensor &tensor2) {
         Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
                       tensor1.dtype());
-        TensorIterator iter;
+        TensorIterator iter = binaryOperationIterator(result, tensor1, tensor2);
 
-        iter.binaryOperationIteration(result, tensor1, tensor2);
-
-        TITYOS_BINARY_OP_FOREACH_SWITCH(*, iter, tensor1.dtype(),
-                                        std::format("Cannot multiply tensors of type {}",
-                                                    dtypeToString(tensor1.dtype())));
+        TITYOS_TYPED_FUNC_SWITCH(
+            tensor1.dtype(),
+            std::format("Cannot multiply tensors of type {}", dtypeToString(tensor1.dtype())),
+            TITYOS_BINARY_OP_FOREACH, *, iter);
 
         return result;
     }
@@ -94,13 +52,12 @@ namespace ty {
     Tensor cpuDivide(Tensor &tensor1, Tensor &tensor2) {
         Tensor result(ty::broadcastCombineShapes(tensor1.shape(), tensor2.shape()),
                       tensor1.dtype());
-        TensorIterator iter;
+        TensorIterator iter = binaryOperationIterator(result, tensor1, tensor2);
 
-        iter.binaryOperationIteration(result, tensor1, tensor2);
-
-        TITYOS_BINARY_OP_FOREACH_SWITCH(
-            /, iter, tensor1.dtype(),
-            std::format("Cannot divide tensors of type {}", dtypeToString(tensor1.dtype())));
+        TITYOS_TYPED_FUNC_SWITCH(
+            tensor1.dtype(),
+            std::format("Cannot divide tensors of type {}", dtypeToString(tensor1.dtype())),
+            TITYOS_BINARY_OP_FOREACH, /, iter);
 
         return result;
     }

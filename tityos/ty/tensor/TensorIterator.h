@@ -30,10 +30,6 @@ namespace ty {
             operands_.push_back(OperandInfo({tensor, OperandType::INPUT}));
         }
 
-        void unaryOperationIteration(Tensor &out, Tensor &in);
-
-        void binaryOperationIteration(Tensor &out, Tensor &in1, Tensor &in2);
-
         int64_t numElements() const {
             // Output is first element by default
             // TODO: Change this
@@ -42,4 +38,7 @@ namespace ty {
 
         void forEach(std::function<void(std::vector<void *> &)> func);
     };
+
+    TensorIterator unaryOperationIterator(Tensor &out, Tensor &in);
+    TensorIterator binaryOperationIterator(Tensor &out, Tensor &in1, Tensor &in2);
 }; // namespace ty
