@@ -11,6 +11,6 @@ namespace ty {
             break;
         }
 
-        return tensor;
+        return std::move(tensor);
     }
 } // namespace ty

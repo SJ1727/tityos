@@ -1,7 +1,7 @@
 #include "tityos/ty/tensor/TensorIterator.h"
 
 namespace ty {
-    TensorIterator unaryOperationIteration(Tensor &out, Tensor &in) {
+    TensorIterator unaryOperationIterator(Tensor &out, Tensor &in) {
         TensorIterator iter;
 
         iter.addOutput(out);
@@ -10,7 +10,7 @@ namespace ty {
         return iter;
     }
 
-    TensorIterator binaryOperationIteration(Tensor &out, Tensor &in1, Tensor &in2) {
+    TensorIterator binaryOperationIterator(Tensor &out, Tensor &in1, Tensor &in2) {
         TensorIterator iter;
 
         iter.addOutput(out);

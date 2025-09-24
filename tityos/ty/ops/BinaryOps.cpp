@@ -14,7 +14,7 @@ namespace ty {
             break;
         }
 
-        return tensor1;
+        return std::move(tensor1);
     }
 
     Tensor subtract(Tensor &tensor1, Tensor &tensor2) {
@@ -30,7 +30,7 @@ namespace ty {
             break;
         }
 
-        return tensor1;
+        return std::move(tensor1);
     }
 
     Tensor multiply(Tensor &tensor1, Tensor &tensor2) {
@@ -46,7 +46,7 @@ namespace ty {
             break;
         }
 
-        return tensor1;
+        return std::move(tensor1);
     }
 
     Tensor divide(Tensor &tensor1, Tensor &tensor2) {
@@ -62,6 +62,6 @@ namespace ty {
             break;
         }
 
-        return tensor1;
+        return std::move(tensor1);
     }
 } // namespace ty

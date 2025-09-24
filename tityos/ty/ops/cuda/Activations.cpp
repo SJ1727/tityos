@@ -2,6 +2,6 @@
 
 namespace ty {
     Tensor cudaRelu(Tensor &tensor) {
-        return tensor;
+        return std::move(tensor);
     }
 } // namespace ty

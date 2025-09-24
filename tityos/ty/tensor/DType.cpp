@@ -64,4 +64,8 @@ namespace ty {
             return "None";
         }
     }
+
+    bool dtypeSupportsGrad(DType type) {
+        return type == DType::float16 || type == DType::float32 || type == DType::float64;
+    }
 }; // namespace ty

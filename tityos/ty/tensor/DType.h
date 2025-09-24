@@ -25,4 +25,6 @@ namespace ty {
     size_t dtypeSize(DType type);
 
     std::string dtypeToString(DType type);
+
+    bool dtypeSupportsGrad(DType type);
 };
