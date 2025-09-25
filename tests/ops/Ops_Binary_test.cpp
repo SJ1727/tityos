@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include "tityos/ty/tityos.h"
+#include "tittyos/ty/tittyos.h"
 
 TEST_CASE("Tensor addition", "[ops][binary]") {
     // Addition with float32

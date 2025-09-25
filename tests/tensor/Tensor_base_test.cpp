@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include "tityos/ty/tityos.h"
+#include "tittyos/ty/tittyos.h"
 
 TEST_CASE("Tensor creation", "[tensor][base]") {
     std::vector<float> testData1(48, 0.0f);
