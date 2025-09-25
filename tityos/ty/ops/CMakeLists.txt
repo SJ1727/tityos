@@ -13,4 +13,7 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/Activations.cpp
     ${CPU_DIR}/Activations.cpp
     ${CUDA_DIR}/Activations.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/UnaryOps.cpp
+    ${CPU_DIR}/UnaryOps.cpp
 )

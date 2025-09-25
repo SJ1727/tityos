@@ -26,7 +26,7 @@ namespace ty {
         case DType::uint64:
             return sizeof(uint64_t);
         case DType::boolean:
-            return sizeof(char);
+            return sizeof(uint8_t);
 
         default:
             return 0;

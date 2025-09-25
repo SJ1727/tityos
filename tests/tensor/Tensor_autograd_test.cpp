@@ -7,8 +7,8 @@ TEST_CASE("Tensor multiplication gradient", "[tensor][autograd]") {
     std::vector<float> testData2(48, 3.0f);
     std::vector<float> initialGrad(48, 1.0f);
 
-    ty::Tensor test1(testData1, ty::Shape({1, 8, 6}), ty::DType::float32, true);
-    ty::Tensor test2(testData2, ty::Shape({1, 8, 6}), ty::DType::float32, true);
+    ty::Tensor test1(testData1, ty::Shape({1, 8, 6}), ty::DType::float32, ty::DeviceType::CPU, true);
+    ty::Tensor test2(testData2, ty::Shape({1, 8, 6}), ty::DType::float32, ty::DeviceType::CPU, true);
 
     auto resultGrad = std::make_shared<ty::Tensor>(initialGrad, ty::Shape({1, 8, 6}));
 

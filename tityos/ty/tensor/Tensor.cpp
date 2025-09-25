@@ -3,11 +3,11 @@
 #include <iostream>
 
 namespace ty {
-    Tensor::Tensor(Shape shape, DType dtype, bool requiresGrad)
+    Tensor::Tensor(Shape shape, DType dtype, Device device, bool requiresGrad)
         : shape_(shape), offset_(0), requiresGrad_(requiresGrad) {
         calculateStrides();
 
-        dataStorage_ = std::make_shared<Storage>(shape_.numElements() * dtypeSize(dtype), dtype);
+        dataStorage_ = std::make_shared<Storage>(shape_.numElements() * dtypeSize(dtype), dtype, device);
 
         if (requiresGrad_) {
             this->zeroGrad();

@@ -5,4 +5,4 @@
 
 namespace ty {
     Shape broadcastCombineShapes(const Shape &shape1, const Shape &shape2);
-}
+} // namespace ty

@@ -33,13 +33,17 @@ namespace ty {
         std::shared_ptr<Tensor> grad_ = nullptr;
 
       public:
-        Tensor(Shape shape, DType dtype = ty::DType::float32, bool requiresGrad = false);
+        Tensor() = default; /* Change this later */
+
+        Tensor(Shape shape, DType dtype = ty::DType::float32, Device device = {DeviceType::CPU, 0},
+               bool requiresGrad = false);
 
         Tensor(const Tensor &tensor) = default;
         Tensor(Tensor &&tensor) noexcept = default;
 
         template <typename Type>
-        Tensor(Type *data, Shape shape, DType dtype = ty::DType::float32, bool requiresGrad = false)
+        Tensor(Type *data, Shape shape, DType dtype = ty::DType::float32,
+               Device device = {DeviceType::CPU, 0}, bool requiresGrad = false)
             : shape_(shape), offset_(0), requiresGrad_(requiresGrad) {
             if (sizeof(Type) != dtypeSize(dtype)) {
                 throw std::runtime_error(
@@ -50,7 +54,7 @@ namespace ty {
 
             // Copying the data
             dataStorage_ =
-                std::make_shared<Storage>(shape_.numElements() * dtypeSize(dtype), dtype);
+                std::make_shared<Storage>(shape_.numElements() * dtypeSize(dtype), dtype, device);
             std::memcpy(dataStorage_->get(0), data, shape_.numElements() * dtypeSize(dtype));
 
             if (requiresGrad_) {
@@ -60,8 +64,8 @@ namespace ty {
 
         template <typename Type>
         Tensor(const std::vector<Type> &data, Shape shape, DType dtype = ty::DType::float32,
-               bool requiresGrad = false)
-            : Tensor(data.data(), shape, dtype, requiresGrad) {}
+               Device device = {DeviceType::CPU, 0}, bool requiresGrad = false)
+            : Tensor(data.data(), shape, dtype, device, requiresGrad) {}
 
         Tensor &operator=(const Tensor &other) = default;
         Tensor &operator=(Tensor &&other) noexcept = default;

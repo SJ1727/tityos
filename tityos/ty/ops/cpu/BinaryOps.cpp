@@ -24,7 +24,18 @@ namespace ty {
 
         // Addition backwards func
         if (tensor1.requiresGrad() || tensor2.requiresGrad()) {
-            /* Not Implemented */
+            result.setBackwardFunc([](std::vector<std::shared_ptr<Tensor>> context, Tensor *grad) {
+                if (context[0]->requiresGrad()) {
+                    *context[0]->grad() = cpuAdd(*grad, *context[0]->grad());
+                }
+
+                if (context[1]->requiresGrad()) {
+                    *context[1]->grad() = cpuAdd(*grad, *context[1]->grad());
+                }
+            });
+
+            result.setContextTensors(
+                {std::make_shared<Tensor>(tensor1), std::make_shared<Tensor>(tensor2)});
         }
 
         return result;
@@ -42,7 +53,18 @@ namespace ty {
 
         // Subtraction backwards func
         if (tensor1.requiresGrad() || tensor2.requiresGrad()) {
-            /* Not Implemented */
+            result.setBackwardFunc([](std::vector<std::shared_ptr<Tensor>> context, Tensor *grad) {
+                if (context[0]->requiresGrad()) {
+                    *context[0]->grad() = cpuAdd(*grad, *context[0]->grad());
+                }
+
+                if (context[1]->requiresGrad()) {
+                    *context[1]->grad() = cpuSubtract(*context[1]->grad(), *grad);
+                }
+            });
+
+            result.setContextTensors(
+                {std::make_shared<Tensor>(tensor1), std::make_shared<Tensor>(tensor2)});
         }
 
         return result;
@@ -91,7 +113,23 @@ namespace ty {
 
         // Division backwards func
         if (tensor1.requiresGrad() || tensor2.requiresGrad()) {
-            /* Not Implemented */
+            result.setBackwardFunc([](std::vector<std::shared_ptr<Tensor>> context, Tensor *grad) {
+                if (context[0]->requiresGrad()) {
+                    Tensor pow0 = cpuPow(*context[1], -1);
+                    Tensor mul0 = cpuMultiply(pow0, *grad);
+                    *context[0]->grad() = cpuAdd(mul0, *context[0]->grad());
+                }
+
+                if (context[1]->requiresGrad()) {
+                    Tensor pow0 = cpuPow(*context[1], -2);
+                    Tensor mul1 = cpuMultiply(*context[0], pow0);
+                    Tensor mul2 = cpuMultiply(mul1, *grad);
+                    *context[1]->grad() = cpuSubtract(*context[1]->grad(), mul2);
+                }
+            });
+
+            result.setContextTensors(
+                {std::make_shared<Tensor>(tensor1), std::make_shared<Tensor>(tensor2)});
         }
 
         return result;

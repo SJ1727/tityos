@@ -4,6 +4,8 @@
 #include "tityos/ty/tensor/TensorIterator.h"
 #include "tityos/ty/common/utils.h"
 #include "tityos/ty/ops/defines.h"
+#include "tityos/ty/ops/cpu/UnaryOps.h"
+#include "tityos/ty/utils/utils.h"
 
 namespace ty {
     Tensor cpuAdd(Tensor &tensor1, Tensor &tensor2);
