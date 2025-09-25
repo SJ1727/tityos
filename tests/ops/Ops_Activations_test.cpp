@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include "tityos/ty/tityos.h"
+#include "tittyos/ty/tittyos.h"
 
 TEST_CASE("Tensor relu", "[ops][activations]") {
     // RELU with float32

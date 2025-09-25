@@ -1,9 +1,9 @@
 <div align="center">
   <img src="logo.png" alt="Logo" width="500"/>
-  
+
 <h1>
     <strong>
-        Tityos
+        tittyos
     </strong>
 </h1>
 </div>
@@ -20,7 +20,7 @@ This project is still under development, as such many features are yet to be imp
 #### Basic Syntax
 
 ```rs
-#include <tityos/ty/tityos.h>
+#include <tittyos/ty/tittyos.h>
 #include <vector>
 
 int main() {
@@ -40,5 +40,5 @@ int main() {
 
 ### **Licensing**
 
-- Read [LICENSE.md](https://github.com/SJ1727/tityos/blob/main/LICENSE)
+- Read [LICENSE.md](https://github.com/SJ1727/tittyos/blob/main/LICENSE)
 - Copyright © 2025 Samuel Johnson ([SJ1727](https://github.com/SJ1727))

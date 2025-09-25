@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include "tityos/ty/tityos.h"
+#include "tittyos/ty/tittyos.h"
 
 TEST_CASE("Tensor multiplication gradient", "[tensor][autograd]") {
     std::vector<float> testData1(48, 2.0f);
