@@ -3,8 +3,9 @@
 #include <cmath>
 
 #include "tityos/ty/tensor/tensor.h"
-#include "tityos/ty/ops/cpu/BinaryOps.h"
+#include "tityos/ty/ops/BinaryOps.h"
+#include "tityos/ty/ops/UnaryOps.h"
 
 namespace ty {
-    Tensor cpuPow(Tensor& tensor, float pow);
+    void cpuPow(Tensor& result, Tensor& tensor, float power);
 }

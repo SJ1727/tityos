@@ -2,7 +2,7 @@
 
 namespace ty {
 
-#define TITYOS_TYPED_FUNC_SWITCH(dtype, errMessage, FUNC, ...)                                     \
+#define TITYOS_TYPED_NUMBER_FUNC_SWITCH(dtype, errMessage, FUNC, ...)                                     \
     switch (dtype) {                                                                               \
     case DType::float16:                                                                           \
         FUNC(uint16_t, __VA_ARGS__);                                                               \

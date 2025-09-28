@@ -20,7 +20,6 @@ target_include_directories(
 
 include(${TY_ROOT_DIR}/ty/CMakeLists.txt)
 
-
 if(BUILD_SHARED_LIBS)
     target_compile_definitions(tityos PRIVATE TITYOS_EXPORTS)
 endif()

@@ -1,14 +1,19 @@
 #include "tityos/ty/ops/UnaryOps.h"
 
 namespace ty {
-    Tensor relu(Tensor &tensor, float pow) {
+    Tensor pow(Tensor &tensor, float power, bool requiresGrad) {
+        bool resultRequiresGrad = tensor.requiresGrad() && requiresGrad;
+
+        Tensor result(tensor.shape(), tensor.dtype(), tensor.device(), resultRequiresGrad);
+
         switch (tensor.device().type()) {
         case DeviceType::CPU:
-            return cpuPow(tensor, pow);
+            cpuPow(result, tensor, power);
+            break;
         default:
             break;
         }
 
-        return std::move(tensor);
+        return std::move(result);
     }
-}
+} // namespace ty

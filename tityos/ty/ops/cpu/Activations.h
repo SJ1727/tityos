@@ -4,11 +4,12 @@
 #include "tityos/ty/tensor/TensorIterator.h"
 #include "tityos/ty/common/utils.h"
 #include "tityos/ty/ops/defines.h"
-#include "tityos/ty/ops/cpu/BinaryOps.h"
+#include "tityos/ty/ops/BinaryOps.h"
+#include "tityos/ty/ops/Activations.h"
 #include "tityos/ty/utils/utils.h"
 
 namespace ty {
-    Tensor cpuRelu(Tensor& tensor);
+    void cpuRelu(Tensor& result, Tensor& tensor);
 
-    Tensor cpuStep(Tensor& tensor);
+    void cpuStep(Tensor& result, Tensor& tensor);
 }

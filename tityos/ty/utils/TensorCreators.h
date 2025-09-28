@@ -1,10 +1,10 @@
 #pragma once
 
 #include "tityos/ty/tensor/tensor.h"
-#include "tityos/ty/utils/defines.h"
+#include "tityos/ty/common/defines.h"
 
 namespace ty {
-    Tensor onesLike(const Tensor& tensor);
+    TITYOS_API Tensor onesLike(const Tensor& tensor);
 
-    Tensor zerosLike(const Tensor& tensor);
+    TITYOS_API Tensor zerosLike(const Tensor& tensor);
 }

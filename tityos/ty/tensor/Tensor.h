@@ -35,7 +35,7 @@ namespace ty {
       public:
         Tensor() = default; /* Change this later */
 
-        Tensor(Shape shape, DType dtype = ty::DType::float32, Device device = {DeviceType::CPU, 0},
+        Tensor(Shape shape, DType dtype = ty::DType::float32, Device device = DeviceType::CPU,
                bool requiresGrad = false);
 
         Tensor(const Tensor &tensor) = default;
@@ -64,7 +64,7 @@ namespace ty {
 
         template <typename Type>
         Tensor(const std::vector<Type> &data, Shape shape, DType dtype = ty::DType::float32,
-               Device device = {DeviceType::CPU, 0}, bool requiresGrad = false)
+               Device device = DeviceType::CPU, bool requiresGrad = false)
             : Tensor(data.data(), shape, dtype, device, requiresGrad) {}
 
         Tensor &operator=(const Tensor &other) = default;

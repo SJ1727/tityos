@@ -8,5 +8,7 @@
 #include "tityos/ty/ops/cuda/Activations.h"
 
 namespace ty {
-    Tensor TITYOS_API relu(Tensor &tensor);
+    Tensor TITYOS_API relu(Tensor &tensor, bool requiresGrad = true);
+
+    Tensor TITYOS_API step(Tensor &tensor, bool requiresGrad = true);
 }

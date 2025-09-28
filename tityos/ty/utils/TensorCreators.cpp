@@ -8,7 +8,7 @@ namespace ty {
     Tensor onesLike(const Tensor &tensor) {
         Tensor likeTensor;
 
-        TITYOS_TYPED_BOOL_FUNC_SWITCH(tensor.dtype(), "", TITYOS_CREATE_TENSOR_WITH_SINGLE_VALUE, tensor,
+        TITYOS_TYPED_FUNC_SWITCH(tensor.dtype(), "", TITYOS_CREATE_TENSOR_WITH_SINGLE_VALUE, tensor,
                                  1);
 
         return likeTensor;
@@ -17,7 +17,7 @@ namespace ty {
     Tensor zerosLike(const Tensor &tensor) {
         Tensor likeTensor;
 
-        TITYOS_TYPED_BOOL_FUNC_SWITCH(tensor.dtype(), "", TITYOS_CREATE_TENSOR_WITH_SINGLE_VALUE, tensor,
+        TITYOS_TYPED_FUNC_SWITCH(tensor.dtype(), "", TITYOS_CREATE_TENSOR_WITH_SINGLE_VALUE, tensor,
                                  0);
 
         return likeTensor;
